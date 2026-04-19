@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:ns="Microsoft.Xna.Framework.Content.Pipeline">
+  <Asset Type="Microsoft.Xna.Framework.Content.Pipeline.Graphics.FontDescription">
+    <FontName>IosevkaNerdFont-Regular.ttf</FontName>
+    <Size>24</Size>
+    <Spacing>2</Spacing>
+    <UseKerning>true</UseKerning>
+    <Style>Regular</Style>
+<!-- Basic ASCII (space to ~) -->
+    <CharacterRegions>
+      <CharacterRegion>
+        <Start>&#32;</Start>
+        <End>&#126;</End>
+      </CharacterRegion>
+      
+      <!-- Extended Latin (includes em-dash –, en-dash –, smart quotes, etc.) -->
+      <CharacterRegion>
+        <Start>&#160;</Start>
+        <End>&#255;</End>
+      </CharacterRegion>
+      
+      <!-- Additional useful characters -->
+      <CharacterRegion>
+        <Start>&#8211;</Start>  <!-- en dash – -->
+        <End>&#8212;</End>      <!-- em dash — -->
+      </CharacterRegion>
+      
+      <CharacterRegion>
+        <Start>&#8216;</Start>  <!-- left single quote ‘ -->
+        <End>&#8221;</End>      <!-- right double quote ” -->
+      </CharacterRegion>
+      </CharacterRegions> 
+  </Asset>
+</XnaContent>

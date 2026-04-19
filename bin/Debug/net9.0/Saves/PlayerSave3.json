@@ -1,0 +1,100 @@
+{
+  "$id": "1",
+  "SaveVersion": 1,
+  "Player": {
+    "$id": "2",
+    "EquippedItems": [
+      {
+        "$id": "3",
+        "Name": "9mm Handgun",
+        "IconPath": "Weapons/Icons/handgun_9mm_icon",
+        "Description": "",
+        "MightBonus": 0,
+        "FinesseBonus": 0
+      },
+      null,
+      null,
+      null
+    ],
+    "Name": "Clint",
+    "Class": "Sharpshooter",
+    "Might": 12,
+    "Finesse": 18,
+    "Wit": 14,
+    "Vigor": 15,
+    "Speed": 16,
+    "Strike": 10,
+    "Arcane": 10,
+    "Hardiness": 10,
+    "Resolve": 10,
+    "Level": 1,
+    "CurrentHP": 150,
+    "MaxHP": 150
+  },
+  "UnlockedHelpers": {
+    "$id": "4",
+    "$values": []
+  },
+  "ActivePartyHelperIds": {
+    "$id": "5",
+    "$values": []
+  },
+  "PlayerInventory": {
+    "$id": "6",
+    "Equipment": {
+      "$id": "7",
+      "$values": []
+    },
+    "Consumables": {
+      "$id": "8",
+      "$values": []
+    }
+  },
+  "MapProgress": {
+    "$id": "9",
+    "MapPoints": {
+      "$id": "10",
+      "$values": [
+        {
+          "$id": "11",
+          "Index": 0,
+          "Name": "Point A - The Starting Glade",
+          "Letter": "A",
+          "IsUnlocked": true,
+          "HeroToUnlock": null,
+          "RecommendedLevel": 0
+        },
+        {
+          "$id": "12",
+          "Index": 1,
+          "Name": "Point B - The Shadowed Path",
+          "Letter": "B",
+          "IsUnlocked": false,
+          "HeroToUnlock": null,
+          "RecommendedLevel": 0
+        },
+        {
+          "$id": "13",
+          "Index": 2,
+          "Name": "Point C - The Crystal Ruins",
+          "Letter": "C",
+          "IsUnlocked": false,
+          "HeroToUnlock": null,
+          "RecommendedLevel": 0
+        },
+        {
+          "$id": "14",
+          "Index": 3,
+          "Name": "Point D - The Storm Peaks",
+          "Letter": "D",
+          "IsUnlocked": false,
+          "HeroToUnlock": null,
+          "RecommendedLevel": 0
+        }
+      ]
+    },
+    "HighestUnlockedIndex": 0
+  },
+  "LastSaved": "2026-04-19T16:24:12.8412686-04:00",
+  "TotalPlayTime": "00:00:00"
+}

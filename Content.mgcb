@@ -1,0 +1,17 @@
+# MonoGame Content Builder Project File
+# Built for DesktopGL on Linux
+
+/begin
+
+# Platform and graphics profile
+/platform:DesktopGL
+/profile:Reach
+/compress:False
+
+# Output directory (relative to project)
+/output:../bin/$(Configuration)/Content
+
+# Reference the DefaultFont.spritefont we created earlier
+/add:DefaultFont.spritefont
+
+/end

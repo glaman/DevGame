@@ -1,0 +1,5 @@
+/home/cjarboe/Games/DevGame/obj/Debug/net9.0/DevGame.csproj.AssemblyReference.cache
+/home/cjarboe/Games/DevGame/obj/Debug/net9.0/DevGame.GeneratedMSBuildEditorConfig.editorconfig
+/home/cjarboe/Games/DevGame/obj/Debug/net9.0/DevGame.AssemblyInfoInputs.cache
+/home/cjarboe/Games/DevGame/obj/Debug/net9.0/DevGame.AssemblyInfo.cs
+/home/cjarboe/Games/DevGame/obj/Debug/net9.0/DevGame.csproj.CoreCompileInputs.cache
