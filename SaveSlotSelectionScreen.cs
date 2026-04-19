@@ -1,10 +1,10 @@
-// SaveSlotSelectionScreen.cs - Complete and correct version
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+// SaveSlotSelectionScreen.cs - Complete version with ExecuteSlotAction
 using System;
 using System.IO;
 using System.Text.Json;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace TurnBasedRPG
 {
@@ -27,9 +27,8 @@ namespace TurnBasedRPG
         private Color _statusColor = Color.White;
         private double _messageTimer = 0;
 
-        public SaveSlotSelectionScreen(Game1 game) : base(game)
-        {
-        }
+        public SaveSlotSelectionScreen(Game1 game)
+            : base(game) { }
 
         public void SetMode(bool isSaveMode)
         {
@@ -44,8 +43,14 @@ namespace TurnBasedRPG
             _whitePixel = new Texture2D(Game.GraphicsDevice, 1, 1);
             _whitePixel.SetData(new Color[] { Color.White });
 
-            try { _font = Game.Content.Load<SpriteFont>("DefaultFont"); }
-            catch { _font = null; }
+            try
+            {
+                _font = Game.Content.Load<SpriteFont>("DefaultFont");
+            }
+            catch
+            {
+                _font = null;
+            }
 
             _backButtonRect = new Rectangle(80, 80, 260, 70);
 
@@ -59,17 +64,25 @@ namespace TurnBasedRPG
         {
             HandleInput(gameTime);
 
-            // DIRECT NUMBER KEY HANDLING (1-8)
+            // Number keys 1-8
             var input = Game.InputManager;
 
-            if (input.IsKeyJustPressed(Keys.D1)) ExecuteSlotAction(1);
-            if (input.IsKeyJustPressed(Keys.D2)) ExecuteSlotAction(2);
-            if (input.IsKeyJustPressed(Keys.D3)) ExecuteSlotAction(3);
-            if (input.IsKeyJustPressed(Keys.D4)) ExecuteSlotAction(4);
-            if (input.IsKeyJustPressed(Keys.D5)) ExecuteSlotAction(5);
-            if (input.IsKeyJustPressed(Keys.D6)) ExecuteSlotAction(6);
-            if (input.IsKeyJustPressed(Keys.D7)) ExecuteSlotAction(7);
-            if (input.IsKeyJustPressed(Keys.D8)) ExecuteSlotAction(8);
+            if (input.IsKeyJustPressed(Keys.D1))
+                ExecuteSlotAction(1);
+            if (input.IsKeyJustPressed(Keys.D2))
+                ExecuteSlotAction(2);
+            if (input.IsKeyJustPressed(Keys.D3))
+                ExecuteSlotAction(3);
+            if (input.IsKeyJustPressed(Keys.D4))
+                ExecuteSlotAction(4);
+            if (input.IsKeyJustPressed(Keys.D5))
+                ExecuteSlotAction(5);
+            if (input.IsKeyJustPressed(Keys.D6))
+                ExecuteSlotAction(6);
+            if (input.IsKeyJustPressed(Keys.D7))
+                ExecuteSlotAction(7);
+            if (input.IsKeyJustPressed(Keys.D8))
+                ExecuteSlotAction(8);
 
             // Message timer
             if (_messageTimer > 0)
@@ -126,7 +139,10 @@ namespace TurnBasedRPG
                 {
                     if (_isSaveMode)
                     {
-                        string filePath = Path.Combine(Game.SaveManager.GetSaveDirectory(), $"PlayerSave{i + 1}.json");
+                        string filePath = Path.Combine(
+                            Game.SaveManager.GetSaveDirectory(),
+                            $"PlayerSave{i + 1}.json"
+                        );
                         if (File.Exists(filePath))
                         {
                             _showingConfirmation = true;
@@ -155,6 +171,33 @@ namespace TurnBasedRPG
                 ExecuteSave(_pendingSlot);
                 _showingConfirmation = false;
                 _pendingSlot = -1;
+            }
+        }
+
+        // This is the method that was missing in previous versions
+        private void ExecuteSlotAction(int slotNumber)
+        {
+            if (_isSaveMode)
+            {
+                string filePath = Path.Combine(
+                    Game.SaveManager.GetSaveDirectory(),
+                    $"PlayerSave{slotNumber}.json"
+                );
+                if (File.Exists(filePath))
+                {
+                    _showingConfirmation = true;
+                    _pendingSlot = slotNumber;
+                    _statusMessage = $"Slot {slotNumber} already exists. Overwrite?";
+                    _statusColor = Color.Yellow;
+                }
+                else
+                {
+                    ExecuteSave(slotNumber);
+                }
+            }
+            else
+            {
+                ExecuteLoad(slotNumber);
             }
         }
 
@@ -203,7 +246,10 @@ namespace TurnBasedRPG
                 {
                     var rect = _slotRects[i];
                     string saveName = $"PlayerSave{i + 1}";
-                    string filePath = Path.Combine(Game.SaveManager.GetSaveDirectory(), saveName + ".json");
+                    string filePath = Path.Combine(
+                        Game.SaveManager.GetSaveDirectory(),
+                        saveName + ".json"
+                    );
 
                     bool hasSave = File.Exists(filePath);
                     string displayText = $"Slot {i + 1} - Empty";
@@ -234,7 +280,10 @@ namespace TurnBasedRPG
                                     lastSaved = savedDate.ToString("yyyy-MM-dd HH:mm");
                             }
                         }
-                        catch { playerName = "Corrupted Save"; }
+                        catch
+                        {
+                            playerName = "Corrupted Save";
+                        }
 
                         displayText = $"Slot {i + 1} - {playerName}";
                         if (!string.IsNullOrEmpty(lastSaved))
@@ -246,29 +295,68 @@ namespace TurnBasedRPG
                     Color slotColor = hasSave ? new Color(60, 80, 100) : new Color(40, 40, 55);
 
                     spriteBatch.Draw(_whitePixel, rect, slotColor);
-                    spriteBatch.DrawString(_font, displayText, 
-                        new Vector2(rect.X + 40, rect.Y + 18), textColor);
+                    spriteBatch.DrawString(
+                        _font,
+                        displayText,
+                        new Vector2(rect.X + 40, rect.Y + 18),
+                        textColor
+                    );
                 }
 
                 // Confirmation dialog
                 if (_showingConfirmation)
                 {
-                    spriteBatch.Draw(_whitePixel, new Rectangle(580, 380, 760, 220), new Color(30, 30, 55));
-                    spriteBatch.DrawString(_font, $"Overwrite Slot {_pendingSlot}?", 
-                        new Vector2(700, 440), Color.Yellow);
+                    spriteBatch.Draw(
+                        _whitePixel,
+                        new Rectangle(580, 380, 760, 220),
+                        new Color(30, 30, 55)
+                    );
+                    spriteBatch.DrawString(
+                        _font,
+                        $"Overwrite Slot {_pendingSlot}?",
+                        new Vector2(700, 440),
+                        Color.Yellow
+                    );
 
-                    spriteBatch.Draw(_whitePixel, new Rectangle(1100, 520, 200, 70), new Color(0, 140, 0));
-                    spriteBatch.DrawString(_font, "YES - OVERWRITE", new Vector2(1130, 545), Color.White);
+                    spriteBatch.Draw(
+                        _whitePixel,
+                        new Rectangle(1100, 520, 200, 70),
+                        new Color(0, 140, 0)
+                    );
+                    spriteBatch.DrawString(
+                        _font,
+                        "YES - OVERWRITE",
+                        new Vector2(1130, 545),
+                        Color.White
+                    );
 
-                    spriteBatch.Draw(_whitePixel, new Rectangle(700, 520, 200, 70), new Color(140, 0, 0));
-                    spriteBatch.DrawString(_font, "NO - CANCEL", new Vector2(750, 545), Color.White);
+                    spriteBatch.Draw(
+                        _whitePixel,
+                        new Rectangle(700, 520, 200, 70),
+                        new Color(140, 0, 0)
+                    );
+                    spriteBatch.DrawString(
+                        _font,
+                        "NO - CANCEL",
+                        new Vector2(750, 545),
+                        Color.White
+                    );
                 }
 
                 // Status message
                 if (!string.IsNullOrEmpty(_statusMessage))
                 {
-                    spriteBatch.Draw(_whitePixel, new Rectangle(580, 700, 760, 50), new Color(0, 0, 0, 160));
-                    spriteBatch.DrawString(_font, _statusMessage, new Vector2(620, 715), _statusColor);
+                    spriteBatch.Draw(
+                        _whitePixel,
+                        new Rectangle(580, 700, 760, 50),
+                        new Color(0, 0, 0, 160)
+                    );
+                    spriteBatch.DrawString(
+                        _font,
+                        _statusMessage,
+                        new Vector2(620, 715),
+                        _statusColor
+                    );
                 }
 
                 spriteBatch.Draw(_whitePixel, _backButtonRect, new Color(100, 30, 30));

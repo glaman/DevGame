@@ -1,10 +1,10 @@
 // MainHubScreen.cs - Cleaned version (no unused variable warnings)
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace TurnBasedRPG
 {
@@ -14,8 +14,10 @@ namespace TurnBasedRPG
         private SpriteFont? _font;
 
         // Icon caches
-        private Dictionary<string, Texture2D?> _weaponIconCache = new Dictionary<string, Texture2D?>();
-        private Dictionary<string, Texture2D?> _heroIconCache = new Dictionary<string, Texture2D?>();
+        private Dictionary<string, Texture2D?> _weaponIconCache =
+            new Dictionary<string, Texture2D?>();
+        private Dictionary<string, Texture2D?> _heroIconCache =
+            new Dictionary<string, Texture2D?>();
         private Texture2D? _playerAvatar;
 
         private Rectangle _topMenuRect;
@@ -34,9 +36,8 @@ namespace TurnBasedRPG
 
         private Rectangle[] _miniMapSelectionRects = new Rectangle[5];
 
-        public MainHubScreen(Game1 game) : base(game)
-        {
-        }
+        public MainHubScreen(Game1 game)
+            : base(game) { }
 
         public override void LoadContent()
         {
@@ -47,7 +48,10 @@ namespace TurnBasedRPG
             {
                 _font = Game.Content.Load<SpriteFont>("DefaultFont");
             }
-            catch { _font = null; }
+            catch
+            {
+                _font = null;
+            }
 
             // Load icons
             LoadWeaponIcons();
@@ -94,10 +98,20 @@ namespace TurnBasedRPG
 
         private void LoadWeaponIcons()
         {
-            var keys = new[] { "handgun_9mm_icon", "rusty_revolver", "compound_bow", "energy_blaster" };
+            var keys = new[]
+            {
+                "handgun_9mm_icon",
+                "rusty_revolver",
+                "compound_bow",
+                "energy_blaster",
+            };
             foreach (var key in keys)
             {
-                string fullPath = Path.Combine(Game.Content.RootDirectory, "Weapons/Icons", key + ".png");
+                string fullPath = Path.Combine(
+                    Game.Content.RootDirectory,
+                    "Weapons/Icons",
+                    key + ".png"
+                );
                 if (File.Exists(fullPath))
                     _weaponIconCache[key] = Texture2D.FromFile(Game.GraphicsDevice, fullPath);
             }
@@ -105,10 +119,22 @@ namespace TurnBasedRPG
 
         private void LoadHeroIcons()
         {
-            var classIcons = new[] { "brawler", "sharpshooter", "healer", "magician", "jack_of_all_trades", "player_male" };
+            var classIcons = new[]
+            {
+                "brawler",
+                "sharpshooter",
+                "healer",
+                "magician",
+                "jack_of_all_trades",
+                "player_male",
+            };
             foreach (var cls in classIcons)
             {
-                string fullPath = Path.Combine(Game.Content.RootDirectory, "Characters/Icons", cls + ".png");
+                string fullPath = Path.Combine(
+                    Game.Content.RootDirectory,
+                    "Characters/Icons",
+                    cls + ".png"
+                );
                 if (File.Exists(fullPath))
                     _heroIconCache[cls] = Texture2D.FromFile(Game.GraphicsDevice, fullPath);
             }
@@ -116,7 +142,10 @@ namespace TurnBasedRPG
 
         private void LoadPlayerAvatar()
         {
-            string fullPath = Path.Combine(Game.Content.RootDirectory, "Characters/Icons/player_male.png");
+            string fullPath = Path.Combine(
+                Game.Content.RootDirectory,
+                "Characters/Icons/player_male.png"
+            );
             if (File.Exists(fullPath))
             {
                 try
@@ -124,7 +153,10 @@ namespace TurnBasedRPG
                     _playerAvatar = Texture2D.FromFile(Game.GraphicsDevice, fullPath);
                     Console.WriteLine("MainHub: Loaded player avatar");
                 }
-                catch { _playerAvatar = null; }
+                catch
+                {
+                    _playerAvatar = null;
+                }
             }
         }
 
@@ -163,7 +195,8 @@ namespace TurnBasedRPG
             for (int i = 0; i < Game.ActiveParty.Count; i++)
             {
                 var hero = Game.ActiveParty[i];
-                if (hero is PlayerHero) continue;
+                if (hero is PlayerHero)
+                    continue;
 
                 if (helperIndex < 2 && _teamHeroBoxes[helperIndex].Contains(mousePosition))
                 {
@@ -176,7 +209,11 @@ namespace TurnBasedRPG
             // Map selection
             if (Game.MapScreen != null)
             {
-                for (int i = 0; i < Game.MapScreen.GetMapCount() && i < _miniMapSelectionRects.Length; i++)
+                for (
+                    int i = 0;
+                    i < Game.MapScreen.GetMapCount() && i < _miniMapSelectionRects.Length;
+                    i++
+                )
                 {
                     if (_miniMapSelectionRects[i].Contains(mousePosition))
                     {
@@ -199,7 +236,11 @@ namespace TurnBasedRPG
                 spriteBatch.DrawString(_font, "MAIN HUB", new Vector2(80, 35), Color.White);
 
                 // Bottom navigation bar
-                spriteBatch.Draw(_whitePixel, new Rectangle(0, 810, 1920, 270), new Color(28, 24, 50));
+                spriteBatch.Draw(
+                    _whitePixel,
+                    new Rectangle(0, 810, 1920, 270),
+                    new Color(28, 24, 50)
+                );
 
                 spriteBatch.Draw(_whitePixel, _equipmentBtnRect, new Color(70, 50, 95));
                 spriteBatch.DrawString(_font, "EQUIPMENT", new Vector2(160, 900), Color.White);
@@ -217,11 +258,20 @@ namespace TurnBasedRPG
                 spriteBatch.Draw(_whitePixel, _playerAvatarRect, new Color(50, 45, 80));
                 if (_playerAvatar != null)
                 {
-                    spriteBatch.Draw(_playerAvatar, new Rectangle(_playerAvatarRect.X + 10, _playerAvatarRect.Y + 10, 100, 100), Color.White);
+                    spriteBatch.Draw(
+                        _playerAvatar,
+                        new Rectangle(_playerAvatarRect.X + 10, _playerAvatarRect.Y + 10, 100, 100),
+                        Color.White
+                    );
                 }
                 else
                 {
-                    spriteBatch.DrawString(_font, "PLAYER", new Vector2(_playerAvatarRect.X + 25, _playerAvatarRect.Y + 45), Color.LightGray);
+                    spriteBatch.DrawString(
+                        _font,
+                        "PLAYER",
+                        new Vector2(_playerAvatarRect.X + 25, _playerAvatarRect.Y + 45),
+                        Color.LightGray
+                    );
                 }
 
                 spriteBatch.DrawString(_font, "CURRENT LOADOUT", new Vector2(140, 305), Color.Cyan);
@@ -240,13 +290,27 @@ namespace TurnBasedRPG
                             string key = item.IconPath.Replace("Weapons/Icons/", "");
                             if (_weaponIconCache.TryGetValue(key, out var icon) && icon != null)
                             {
-                                spriteBatch.Draw(icon, new Rectangle(slotRect.X + 10, slotRect.Y + 5, 55, 55), Color.White);
+                                spriteBatch.Draw(
+                                    icon,
+                                    new Rectangle(slotRect.X + 10, slotRect.Y + 5, 55, 55),
+                                    Color.White
+                                );
                             }
-                            spriteBatch.DrawString(_font, item.Name, new Vector2(slotRect.X + 80, slotRect.Y + 18), Color.LightGreen);
+                            spriteBatch.DrawString(
+                                _font,
+                                item.Name,
+                                new Vector2(slotRect.X + 80, slotRect.Y + 18),
+                                Color.LightGreen
+                            );
                         }
                         else
                         {
-                            spriteBatch.DrawString(_font, $"Slot {i + 1} - Empty", new Vector2(slotRect.X + 20, slotRect.Y + 20), Color.LightGray);
+                            spriteBatch.DrawString(
+                                _font,
+                                $"Slot {i + 1} - Empty",
+                                new Vector2(slotRect.X + 20, slotRect.Y + 20),
+                                Color.LightGray
+                            );
                         }
                     }
                 }
@@ -257,26 +321,46 @@ namespace TurnBasedRPG
 
                 if (Game.MapScreen != null)
                 {
-                    for (int i = 0; i < Game.MapScreen.GetMapCount() && i < _miniMapSelectionRects.Length; i++)
+                    for (
+                        int i = 0;
+                        i < Game.MapScreen.GetMapCount() && i < _miniMapSelectionRects.Length;
+                        i++
+                    )
                     {
                         string mapName = Game.MapScreen.GetMapName(i);
                         bool isCurrent = i == Game.MapScreen.GetCurrentMapIndex();
                         var rect = _miniMapSelectionRects[i];
-                        spriteBatch.Draw(_whitePixel, rect, isCurrent ? new Color(80, 60, 120) : new Color(45, 40, 75));
-                        spriteBatch.DrawString(_font, mapName, new Vector2(rect.X + 30, rect.Y + 15), isCurrent ? Color.Yellow : Color.White);
+                        spriteBatch.Draw(
+                            _whitePixel,
+                            rect,
+                            isCurrent ? new Color(80, 60, 120) : new Color(45, 40, 75)
+                        );
+                        spriteBatch.DrawString(
+                            _font,
+                            mapName,
+                            new Vector2(rect.X + 30, rect.Y + 15),
+                            isCurrent ? Color.Yellow : Color.White
+                        );
                     }
                 }
 
                 // Current Team
                 spriteBatch.Draw(_whitePixel, _teamRect, new Color(38, 33, 68));
-                spriteBatch.DrawString(_font, "CURRENT TEAM (2/2)", new Vector2(1510, 180), Color.Cyan);
+                spriteBatch.DrawString(
+                    _font,
+                    "CURRENT TEAM (2/2)",
+                    new Vector2(1510, 180),
+                    Color.Cyan
+                );
 
                 int helperIndex = 0;
                 for (int i = 0; i < Game.ActiveParty.Count; i++)
                 {
                     var hero = Game.ActiveParty[i];
-                    if (hero is PlayerHero) continue;
-                    if (helperIndex >= 2) break;
+                    if (hero is PlayerHero)
+                        continue;
+                    if (helperIndex >= 2)
+                        break;
 
                     var boxRect = _teamHeroBoxes[helperIndex];
                     var avatarRect = _teamAvatarRects[helperIndex];
@@ -284,18 +368,36 @@ namespace TurnBasedRPG
                     spriteBatch.Draw(_whitePixel, boxRect, new Color(48, 42, 75));
 
                     string classKey = hero.Class.ToLower().Replace(" ", "_").Replace("-", "_");
-                    if (_heroIconCache.TryGetValue(classKey, out var avatarIcon) && avatarIcon != null)
+                    if (
+                        _heroIconCache.TryGetValue(classKey, out var avatarIcon)
+                        && avatarIcon != null
+                    )
                     {
                         spriteBatch.Draw(avatarIcon, avatarRect, Color.White);
                     }
                     else
                     {
                         spriteBatch.Draw(_whitePixel, avatarRect, new Color(60, 55, 85));
-                        spriteBatch.DrawString(_font, "AVATAR", new Vector2(avatarRect.X + 35, avatarRect.Y + 55), Color.LightGray);
+                        spriteBatch.DrawString(
+                            _font,
+                            "AVATAR",
+                            new Vector2(avatarRect.X + 35, avatarRect.Y + 55),
+                            Color.LightGray
+                        );
                     }
 
-                    spriteBatch.DrawString(_font, hero.Name, new Vector2(boxRect.X + 25, boxRect.Y + 195), Color.White);
-                    spriteBatch.DrawString(_font, $"({hero.Class})", new Vector2(boxRect.X + 25, boxRect.Y + 220), Color.Cyan);
+                    spriteBatch.DrawString(
+                        _font,
+                        hero.Name,
+                        new Vector2(boxRect.X + 25, boxRect.Y + 195),
+                        Color.White
+                    );
+                    spriteBatch.DrawString(
+                        _font,
+                        $"({hero.Class})",
+                        new Vector2(boxRect.X + 25, boxRect.Y + 220),
+                        Color.Cyan
+                    );
 
                     helperIndex++;
                 }
