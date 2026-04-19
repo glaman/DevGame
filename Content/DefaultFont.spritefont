@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<XnaContent xmlns:ns="Microsoft.Xna.Framework.Content.Pipeline">
-  <Asset Type="Microsoft.Xna.Framework.Content.Pipeline.Graphics.FontDescription">
+<XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
+  <Asset Type="Graphics:FontDescription">
     <FontName>IosevkaNerdFont-Regular.ttf</FontName>
-    <Size>14</Size>
+    <Size>16</Size>
     <Spacing>2</Spacing>
     <UseKerning>true</UseKerning>
     <Style>Regular</Style>
@@ -10,6 +10,10 @@
       <CharacterRegion>
         <Start>&#32;</Start>
         <End>&#126;</End>
+      </CharacterRegion>
+      <CharacterRegion>
+        <Start>&#160;</Start>
+        <End>&#255;</End>
       </CharacterRegion>
     </CharacterRegions>
   </Asset>

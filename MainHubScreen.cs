@@ -1,4 +1,4 @@
-// MainHubScreen.cs - Cleaned version (no unused variable warnings)
+// MainHubScreen.cs - Player avatar is now clickable → Player Profile Screen
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +24,6 @@ namespace TurnBasedRPG
         private Rectangle _equipmentBtnRect;
         private Rectangle _objectivesBtnRect;
         private Rectangle _heroesBtnRect;
-
         private Rectangle _loadoutRect;
         private Rectangle _mapRect;
         private Rectangle _teamRect;
@@ -32,8 +31,7 @@ namespace TurnBasedRPG
         private Rectangle[] _loadoutSlotRects = new Rectangle[4];
         private Rectangle[] _teamHeroBoxes = new Rectangle[2];
         private Rectangle[] _teamAvatarRects = new Rectangle[2];
-        private Rectangle _playerAvatarRect;
-
+        private Rectangle _playerAvatarRect; // Clickable player avatar
         private Rectangle[] _miniMapSelectionRects = new Rectangle[5];
 
         public MainHubScreen(Game1 game)
@@ -58,9 +56,8 @@ namespace TurnBasedRPG
             LoadHeroIcons();
             LoadPlayerAvatar();
 
-            // Layout rectangles
+            // Layout rectangles (unchanged)
             _topMenuRect = new Rectangle(0, 0, 1920, 110);
-
             _equipmentBtnRect = new Rectangle(120, 850, 260, 140);
             _objectivesBtnRect = new Rectangle(420, 850, 800, 140);
             _heroesBtnRect = new Rectangle(1260, 850, 260, 140);
@@ -69,10 +66,10 @@ namespace TurnBasedRPG
             _mapRect = new Rectangle(460, 150, 400, 620);
             _teamRect = new Rectangle(1480, 150, 360, 620);
 
-            // Player avatar area above loadout
+            // Player avatar area (clickable)
             _playerAvatarRect = new Rectangle(140, 170, 120, 120);
 
-            // Loadout slots (shifted down)
+            // Loadout slots
             int slotY = 310;
             for (int i = 0; i < 4; i++)
             {
@@ -83,7 +80,6 @@ namespace TurnBasedRPG
             // Team boxes
             _teamHeroBoxes[0] = new Rectangle(1510, 220, 300, 240);
             _teamHeroBoxes[1] = new Rectangle(1510, 490, 300, 240);
-
             _teamAvatarRects[0] = new Rectangle(1530, 245, 140, 140);
             _teamAvatarRects[1] = new Rectangle(1530, 515, 140, 140);
 
@@ -162,12 +158,21 @@ namespace TurnBasedRPG
 
         public override void Update(GameTime gameTime)
         {
-            HandleInput(gameTime);
+            HandleInput(gameTime); // This calls OnMouseClick when mouse is pressed
             Game.Window.Title = $"DevGame - Main Hub - {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
         }
 
         protected override void OnMouseClick(Point mousePosition)
         {
+            // === NEW: Click on player avatar goes to Player Profile ===
+            if (_playerAvatarRect.Contains(mousePosition))
+            {
+                Console.WriteLine("MainHub: Player avatar clicked → Player Profile");
+                Game.ChangeState(GameState.PlayerProfile);
+                return;
+            }
+
+            // Existing click handlers (unchanged)
             if (_equipmentBtnRect.Contains(mousePosition))
             {
                 Game.ChangeState(GameState.Equipment);
@@ -197,7 +202,6 @@ namespace TurnBasedRPG
                 var hero = Game.ActiveParty[i];
                 if (hero is PlayerHero)
                     continue;
-
                 if (helperIndex < 2 && _teamHeroBoxes[helperIndex].Contains(mousePosition))
                 {
                     Game.ShowHeroDetail(hero);
@@ -241,20 +245,17 @@ namespace TurnBasedRPG
                     new Rectangle(0, 810, 1920, 270),
                     new Color(28, 24, 50)
                 );
-
                 spriteBatch.Draw(_whitePixel, _equipmentBtnRect, new Color(70, 50, 95));
                 spriteBatch.DrawString(_font, "EQUIPMENT", new Vector2(160, 900), Color.White);
-
                 spriteBatch.Draw(_whitePixel, _objectivesBtnRect, new Color(55, 45, 85));
                 spriteBatch.DrawString(_font, "OBJECTIVES", new Vector2(520, 900), Color.White);
-
                 spriteBatch.Draw(_whitePixel, _heroesBtnRect, new Color(70, 50, 95));
                 spriteBatch.DrawString(_font, "HEROES", new Vector2(1300, 900), Color.White);
 
                 // Current Loadout Section
                 spriteBatch.Draw(_whitePixel, _loadoutRect, new Color(38, 33, 68));
 
-                // Player Avatar
+                // Player Avatar (clickable area)
                 spriteBatch.Draw(_whitePixel, _playerAvatarRect, new Color(50, 45, 80));
                 if (_playerAvatar != null)
                 {
@@ -283,7 +284,6 @@ namespace TurnBasedRPG
                     {
                         var slotRect = _loadoutSlotRects[i];
                         spriteBatch.Draw(_whitePixel, slotRect, new Color(50, 45, 75));
-
                         var item = Game.Player.EquippedItems?[i];
                         if (item != null)
                         {
@@ -315,7 +315,7 @@ namespace TurnBasedRPG
                     }
                 }
 
-                // Map area
+                // Map area (unchanged)
                 spriteBatch.Draw(_whitePixel, _mapRect, new Color(25, 38, 52));
                 spriteBatch.DrawString(_font, "AVAILABLE MAPS", new Vector2(520, 180), Color.Cyan);
 
@@ -344,7 +344,7 @@ namespace TurnBasedRPG
                     }
                 }
 
-                // Current Team
+                // Current Team (unchanged)
                 spriteBatch.Draw(_whitePixel, _teamRect, new Color(38, 33, 68));
                 spriteBatch.DrawString(
                     _font,
