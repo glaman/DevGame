@@ -96,7 +96,7 @@ namespace TurnBasedRPG
             Game.Window.Title = $"DevGame - {modeText} Slot - {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
         }
 
-        protected override void OnMouseClick(Point mousePosition)
+        public override void OnMouseClick(Point mousePosition)
         {
             if (_backButtonRect.Contains(mousePosition))
             {

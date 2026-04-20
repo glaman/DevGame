@@ -1,9 +1,9 @@
-﻿// Game1.cs - Full updated version with SaveSlotSelectionScreen support
+﻿// Game1.cs - Fixed mouse click forwarding + battle support
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
 
 namespace TurnBasedRPG
 {
@@ -11,7 +11,6 @@ namespace TurnBasedRPG
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-
         private UIManager _uiManager;
         private InputManager _inputManager;
         private SaveManager _saveManager;
@@ -30,7 +29,6 @@ namespace TurnBasedRPG
         // Game state data
         public PlayerHero? Player { get; set; }
         public List<Hero> ActiveParty { get; private set; } = new List<Hero>();
-
         private Stack<Screen> _screenHistory = new Stack<Screen>();
 
         public Game1()
@@ -38,7 +36,6 @@ namespace TurnBasedRPG
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-
             _graphics.PreferredBackBufferWidth = 1920;
             _graphics.PreferredBackBufferHeight = 1080;
             _graphics.ApplyChanges();
@@ -67,9 +64,7 @@ namespace TurnBasedRPG
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
             InitializeTestData();
-
             PushScreen(_titleScreen);
         }
 
@@ -86,10 +81,18 @@ namespace TurnBasedRPG
             Player.EquipItem(0, handgun);
 
             var brawler = new HelperHero("Grom", "Brawler");
-            brawler.Might = 20; brawler.Finesse = 10; brawler.Wit = 8; brawler.Vigor = 18; brawler.Speed = 12;
+            brawler.Might = 20;
+            brawler.Finesse = 10;
+            brawler.Wit = 8;
+            brawler.Vigor = 18;
+            brawler.Speed = 12;
 
             var healer = new HelperHero("Lira", "Healer");
-            healer.Might = 9; healer.Finesse = 12; healer.Wit = 19; healer.Vigor = 16; healer.Speed = 13;
+            healer.Might = 9;
+            healer.Finesse = 12;
+            healer.Wit = 19;
+            healer.Vigor = 16;
+            healer.Speed = 13;
 
             ActiveParty.Clear();
             ActiveParty.Add(Player);
@@ -107,6 +110,17 @@ namespace TurnBasedRPG
                 return;
             }
 
+            // CRITICAL: Forward mouse clicks to the current screen
+            MouseState mouse = Mouse.GetState();
+            if (mouse.LeftButton == ButtonState.Pressed)
+            {
+                if (_uiManager.CurrentScreen != null)
+                {
+                    Point mousePos = new Point(mouse.X, mouse.Y);
+                    _uiManager.CurrentScreen.OnMouseClick(mousePos);
+                }
+            }
+
             _uiManager.Update(gameTime);
             base.Update(gameTime);
         }
@@ -117,12 +131,10 @@ namespace TurnBasedRPG
             _spriteBatch.Begin();
             _uiManager.Draw(_spriteBatch);
             _spriteBatch.End();
-
             base.Draw(gameTime);
         }
 
         // ====================== SCREEN MANAGEMENT ======================
-
         public void ChangeState(GameState state)
         {
             Screen? newScreen = state switch
@@ -135,7 +147,7 @@ namespace TurnBasedRPG
                 GameState.HeroGallery => _heroGalleryScreen,
                 GameState.PlayerProfile => _playerProfileScreen,
                 GameState.SaveSlotSelection => _saveSlotSelectionScreen,
-                _ => _mainHubScreen
+                _ => _mainHubScreen,
             };
 
             if (newScreen != null)
@@ -172,7 +184,6 @@ namespace TurnBasedRPG
         }
 
         // ====================== SAVE / LOAD ======================
-
         public bool SaveCurrentGame(int slotNumber = 1)
         {
             return _saveManager.SaveGame(this, slotNumber);
@@ -191,11 +202,11 @@ namespace TurnBasedRPG
         public SaveManager SaveManager => _saveManager;
 
         // ====================== PUBLIC ACCESSORS ======================
-
         public InputManager InputManager => _inputManager;
         public EquipmentScreen EquipmentScreen => _equipmentScreen;
         public MapScreen MapScreen => _mapScreen;
         public PlayerProfileScreen PlayerProfileScreen => _playerProfileScreen;
-        public SaveSlotSelectionScreen SaveSlotSelectionScreen => _saveSlotSelectionScreen;  // Added for easy access
+        public SaveSlotSelectionScreen SaveSlotSelectionScreen => _saveSlotSelectionScreen;
+        public BattleScreen BattleScreen => _battleScreen; // Added for easy access if needed
     }
 }

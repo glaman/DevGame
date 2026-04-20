@@ -162,7 +162,7 @@ namespace TurnBasedRPG
             Game.Window.Title = $"DevGame - Main Hub - {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
         }
 
-        protected override void OnMouseClick(Point mousePosition)
+        public override void OnMouseClick(Point mousePosition)
         {
             // === NEW: Click on player avatar goes to Player Profile ===
             if (_playerAvatarRect.Contains(mousePosition))

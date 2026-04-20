@@ -1,10 +1,10 @@
 // EquipmentScreen.cs - Proper icon per item
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace TurnBasedRPG
 {
@@ -22,17 +22,22 @@ namespace TurnBasedRPG
         private Rectangle[] _inventoryRects = new Rectangle[8];
         private Rectangle _backButtonRect;
 
-        public EquipmentScreen(Game1 game) : base(game)
-        {
-        }
+        public EquipmentScreen(Game1 game)
+            : base(game) { }
 
         public override void LoadContent()
         {
             _whitePixel = new Texture2D(Game.GraphicsDevice, 1, 1);
             _whitePixel.SetData(new Color[] { Color.White });
 
-            try { _font = Game.Content.Load<SpriteFont>("DefaultFont"); }
-            catch { _font = null; }
+            try
+            {
+                _font = Game.Content.Load<SpriteFont>("DefaultFont");
+            }
+            catch
+            {
+                _font = null;
+            }
 
             // === Define all equipment items ===
             _inventoryItems.Clear();
@@ -40,10 +45,26 @@ namespace TurnBasedRPG
 
             var items = new[]
             {
-                new EquipmentItem("9mm Handgun",     "Weapons/Icons/handgun_9mm_icon",     "Basic starter pistol"),
-                new EquipmentItem("Rusty Revolver",  "Weapons/Icons/rusty_revolver",      "Old reliable sidearm"),
-                new EquipmentItem("Compound Bow",    "Weapons/Icons/compound_bow",        "Silent powerful bow"),
-                new EquipmentItem("Energy Blaster",  "Weapons/Icons/energy_blaster",      "Futuristic plasma weapon")
+                new EquipmentItem(
+                    "9mm Handgun",
+                    "Weapons/Icons/handgun_9mm_icon",
+                    "Basic starter pistol"
+                ),
+                new EquipmentItem(
+                    "Rusty Revolver",
+                    "Weapons/Icons/rusty_revolver",
+                    "Old reliable sidearm"
+                ),
+                new EquipmentItem(
+                    "Compound Bow",
+                    "Weapons/Icons/compound_bow",
+                    "Silent powerful bow"
+                ),
+                new EquipmentItem(
+                    "Energy Blaster",
+                    "Weapons/Icons/energy_blaster",
+                    "Futuristic plasma weapon"
+                ),
             };
 
             foreach (var item in items)
@@ -79,7 +100,12 @@ namespace TurnBasedRPG
             {
                 for (int col = 0; col < 4; col++)
                 {
-                    _inventoryRects[index] = new Rectangle(220 + col * 230, 340 + row * 210, 160, 160);
+                    _inventoryRects[index] = new Rectangle(
+                        220 + col * 230,
+                        340 + row * 210,
+                        160,
+                        160
+                    );
                     index++;
                 }
             }
@@ -99,7 +125,7 @@ namespace TurnBasedRPG
             Game.Window.Title = $"DevGame - Equipment Screen - {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
         }
 
-        protected override void OnMouseClick(Point mousePos)
+        public override void OnMouseClick(Point mousePos)
         {
             if (_backButtonRect.Contains(mousePos))
             {
@@ -109,10 +135,16 @@ namespace TurnBasedRPG
 
             for (int i = 0; i < _inventoryItems.Count && i < _inventoryRects.Length; i++)
             {
-                if (_inventoryRects[i].Contains(mousePos) && _selectedSlot >= 0 && Game.Player != null)
+                if (
+                    _inventoryRects[i].Contains(mousePos)
+                    && _selectedSlot >= 0
+                    && Game.Player != null
+                )
                 {
                     Game.Player.EquipItem(_selectedSlot, _inventoryItems[i]);
-                    Console.WriteLine($"Equipped '{_inventoryItems[i].Name}' to slot {_selectedSlot + 1}");
+                    Console.WriteLine(
+                        $"Equipped '{_inventoryItems[i].Name}' to slot {_selectedSlot + 1}"
+                    );
                     ReturnToPrevious();
                     return;
                 }
@@ -133,12 +165,27 @@ namespace TurnBasedRPG
 
             if (_font != null)
             {
-                spriteBatch.DrawString(_font, "EQUIPMENT MANAGEMENT", new Vector2(680, 80), Color.White);
+                spriteBatch.DrawString(
+                    _font,
+                    "EQUIPMENT MANAGEMENT",
+                    new Vector2(680, 80),
+                    Color.White
+                );
 
                 if (_selectedSlot >= 0)
-                    spriteBatch.DrawString(_font, $"Equipping to Slot {_selectedSlot + 1}", new Vector2(200, 160), Color.Yellow);
+                    spriteBatch.DrawString(
+                        _font,
+                        $"Equipping to Slot {_selectedSlot + 1}",
+                        new Vector2(200, 160),
+                        Color.Yellow
+                    );
 
-                spriteBatch.DrawString(_font, "AVAILABLE ITEMS - Click to equip", new Vector2(200, 260), Color.Cyan);
+                spriteBatch.DrawString(
+                    _font,
+                    "AVAILABLE ITEMS - Click to equip",
+                    new Vector2(200, 260),
+                    Color.Cyan
+                );
 
                 for (int i = 0; i < _inventoryItems.Count && i < _inventoryRects.Length; i++)
                 {
@@ -147,18 +194,37 @@ namespace TurnBasedRPG
 
                     if (i < _loadedIcons.Count && _loadedIcons[i] != null)
                     {
-                        spriteBatch.Draw(_loadedIcons[i]!, new Rectangle(rect.X + 10, rect.Y + 10, 140, 140), Color.White);
+                        spriteBatch.Draw(
+                            _loadedIcons[i]!,
+                            new Rectangle(rect.X + 10, rect.Y + 10, 140, 140),
+                            Color.White
+                        );
                     }
                     else
                     {
-                        spriteBatch.DrawString(_font, "NO ICON", new Vector2(rect.X + 40, rect.Y + 70), Color.Red);
+                        spriteBatch.DrawString(
+                            _font,
+                            "NO ICON",
+                            new Vector2(rect.X + 40, rect.Y + 70),
+                            Color.Red
+                        );
                     }
 
-                    spriteBatch.DrawString(_font, _inventoryItems[i].Name, new Vector2(rect.X + 10, rect.Y + 170), Color.LightGray);
+                    spriteBatch.DrawString(
+                        _font,
+                        _inventoryItems[i].Name,
+                        new Vector2(rect.X + 10, rect.Y + 170),
+                        Color.LightGray
+                    );
                 }
 
                 spriteBatch.Draw(_whitePixel, _backButtonRect, new Color(100, 30, 30));
-                spriteBatch.DrawString(_font, "BACK TO PREVIOUS", new Vector2(1530, 105), Color.White);
+                spriteBatch.DrawString(
+                    _font,
+                    "BACK TO PREVIOUS",
+                    new Vector2(1530, 105),
+                    Color.White
+                );
 
                 DrawDevMenu(spriteBatch, _font);
             }

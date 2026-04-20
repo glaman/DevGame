@@ -1,9 +1,9 @@
 // HeroDetailScreen.cs - Fixed constructor + proper icon loading
+using System;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.IO;
 
 namespace TurnBasedRPG
 {
@@ -18,9 +18,8 @@ namespace TurnBasedRPG
         private Rectangle _backButtonRect;
 
         // Constructor - only takes Game1 (matches what Game1.cs expects)
-        public HeroDetailScreen(Game1 game) : base(game)
-        {
-        }
+        public HeroDetailScreen(Game1 game)
+            : base(game) { }
 
         // Method to set the hero to display (called from Game1.ShowHeroDetail)
         public void SetHero(Hero hero)
@@ -32,7 +31,8 @@ namespace TurnBasedRPG
         private void LoadHeroIcon()
         {
             _heroIcon = null;
-            if (_currentHero == null) return;
+            if (_currentHero == null)
+                return;
 
             string iconPath = GetIconPathForClass(_currentHero.Class);
 
@@ -47,7 +47,9 @@ namespace TurnBasedRPG
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to load hero icon {_currentHero.Class}: {ex.Message}");
+                    Console.WriteLine(
+                        $"Failed to load hero icon {_currentHero.Class}: {ex.Message}"
+                    );
                 }
             }
             else
@@ -64,8 +66,9 @@ namespace TurnBasedRPG
                 "sharpshooter" => "Characters/Icons/sharpshooter",
                 "healer" => "Characters/Icons/healer",
                 "magician" => "Characters/Icons/magician",
-                "jack of all trades" or "jack-of-all-trades" => "Characters/Icons/jack_of_all_trades",
-                _ => "Characters/Icons/player_male"  // fallback
+                "jack of all trades" or "jack-of-all-trades" =>
+                    "Characters/Icons/jack_of_all_trades",
+                _ => "Characters/Icons/player_male", // fallback
             };
         }
 
@@ -74,13 +77,13 @@ namespace TurnBasedRPG
             _whitePixel = new Texture2D(Game.GraphicsDevice, 1, 1);
             _whitePixel.SetData(new Color[] { Color.White });
 
-            try 
-            { 
-                _font = Game.Content.Load<SpriteFont>("DefaultFont"); 
+            try
+            {
+                _font = Game.Content.Load<SpriteFont>("DefaultFont");
             }
-            catch 
-            { 
-                _font = null; 
+            catch
+            {
+                _font = null;
             }
 
             _backButtonRect = new Rectangle(1500, 80, 300, 80);
@@ -92,7 +95,7 @@ namespace TurnBasedRPG
             Game.Window.Title = $"DevGame - Hero Detail - {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
         }
 
-        protected override void OnMouseClick(Point mousePos)
+        public override void OnMouseClick(Point mousePos)
         {
             if (_backButtonRect.Contains(mousePos))
             {
@@ -114,28 +117,81 @@ namespace TurnBasedRPG
 
                 if (_heroIcon != null)
                 {
-                    spriteBatch.Draw(_heroIcon, new Rectangle(portraitRect.X + 40, portraitRect.Y + 40, 440, 440), Color.White);
+                    spriteBatch.Draw(
+                        _heroIcon,
+                        new Rectangle(portraitRect.X + 40, portraitRect.Y + 40, 440, 440),
+                        Color.White
+                    );
                 }
                 else
                 {
-                    spriteBatch.DrawString(_font, "NO ICON", new Vector2(portraitRect.X + 180, portraitRect.Y + 240), Color.Red);
+                    spriteBatch.DrawString(
+                        _font,
+                        "NO ICON",
+                        new Vector2(portraitRect.X + 180, portraitRect.Y + 240),
+                        Color.Red
+                    );
                 }
 
                 // Hero information
-                spriteBatch.DrawString(_font, _currentHero.Name.ToUpper(), new Vector2(820, 220), Color.White);
-                spriteBatch.DrawString(_font, _currentHero.Class, new Vector2(820, 280), Color.Cyan);
+                spriteBatch.DrawString(
+                    _font,
+                    _currentHero.Name.ToUpper(),
+                    new Vector2(820, 220),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    _font,
+                    _currentHero.Class,
+                    new Vector2(820, 280),
+                    Color.Cyan
+                );
 
                 // Stats
                 int y = 380;
-                spriteBatch.DrawString(_font, $"Might     : {_currentHero.Might}", new Vector2(820, y), Color.LightGray); y += 45;
-                spriteBatch.DrawString(_font, $"Finesse   : {_currentHero.Finesse}", new Vector2(820, y), Color.LightGray); y += 45;
-                spriteBatch.DrawString(_font, $"Wit       : {_currentHero.Wit}", new Vector2(820, y), Color.LightGray); y += 45;
-                spriteBatch.DrawString(_font, $"Vigor     : {_currentHero.Vigor}", new Vector2(820, y), Color.LightGray); y += 45;
-                spriteBatch.DrawString(_font, $"Speed     : {_currentHero.Speed}", new Vector2(820, y), Color.LightGray);
+                spriteBatch.DrawString(
+                    _font,
+                    $"Might     : {_currentHero.Might}",
+                    new Vector2(820, y),
+                    Color.LightGray
+                );
+                y += 45;
+                spriteBatch.DrawString(
+                    _font,
+                    $"Finesse   : {_currentHero.Finesse}",
+                    new Vector2(820, y),
+                    Color.LightGray
+                );
+                y += 45;
+                spriteBatch.DrawString(
+                    _font,
+                    $"Wit       : {_currentHero.Wit}",
+                    new Vector2(820, y),
+                    Color.LightGray
+                );
+                y += 45;
+                spriteBatch.DrawString(
+                    _font,
+                    $"Vigor     : {_currentHero.Vigor}",
+                    new Vector2(820, y),
+                    Color.LightGray
+                );
+                y += 45;
+                spriteBatch.DrawString(
+                    _font,
+                    $"Speed     : {_currentHero.Speed}",
+                    new Vector2(820, y),
+                    Color.LightGray
+                );
 
                 // Back button
                 spriteBatch.Draw(_whitePixel, _backButtonRect, new Color(100, 30, 30));
-                spriteBatch.DrawString(_font, "BACK TO GALLERY", new Vector2(1530, 105), Color.White);
+                spriteBatch.DrawString(
+                    _font,
+                    "BACK TO GALLERY",
+                    new Vector2(1530, 105),
+                    Color.White
+                );
 
                 DrawDevMenu(spriteBatch, _font);
             }

@@ -1,9 +1,9 @@
 // HeroGalleryScreen.cs - Improved icon loading with better debugging
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TurnBasedRPG
 {
@@ -15,11 +15,11 @@ namespace TurnBasedRPG
         private Rectangle[] _heroRects = new Rectangle[8];
 
         // Cache for hero class icons
-        private Dictionary<string, Texture2D?> _heroIconCache = new Dictionary<string, Texture2D?>();
+        private Dictionary<string, Texture2D?> _heroIconCache =
+            new Dictionary<string, Texture2D?>();
 
-        public HeroGalleryScreen(Game1 game) : base(game)
-        {
-        }
+        public HeroGalleryScreen(Game1 game)
+            : base(game) { }
 
         public override void LoadContent()
         {
@@ -30,7 +30,10 @@ namespace TurnBasedRPG
             {
                 _font = Game.Content.Load<SpriteFont>("DefaultFont");
             }
-            catch { _font = null; }
+            catch
+            {
+                _font = null;
+            }
 
             // Load hero icons
             LoadHeroIcons();
@@ -58,12 +61,16 @@ namespace TurnBasedRPG
                 { "magician", "magician" },
                 { "jack of all trades", "jack_of_all_trades" },
                 { "jack-of-all-trades", "jack_of_all_trades" },
-                { "player", "player_male" }   // fallback
+                { "player", "player_male" }, // fallback
             };
 
             foreach (var entry in classToFile)
             {
-                string fullPath = Path.Combine(Game.Content.RootDirectory, "Characters/Icons", entry.Value + ".png");
+                string fullPath = Path.Combine(
+                    Game.Content.RootDirectory,
+                    "Characters/Icons",
+                    entry.Value + ".png"
+                );
 
                 if (File.Exists(fullPath))
                 {
@@ -75,7 +82,9 @@ namespace TurnBasedRPG
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"HeroGallery: Failed to load {entry.Value}.png → {ex.Message}");
+                        Console.WriteLine(
+                            $"HeroGallery: Failed to load {entry.Value}.png → {ex.Message}"
+                        );
                         _heroIconCache[entry.Key] = null;
                     }
                 }
@@ -93,16 +102,20 @@ namespace TurnBasedRPG
             Game.Window.Title = $"DevGame - Hero Gallery - {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
         }
 
-        protected override void OnMouseClick(Point mousePos)
+        public override void OnMouseClick(Point mousePos)
         {
             int displayedIndex = 0;
 
             for (int i = 0; i < Game.ActiveParty.Count; i++)
             {
                 var hero = Game.ActiveParty[i];
-                if (hero is PlayerHero) continue;
+                if (hero is PlayerHero)
+                    continue;
 
-                if (displayedIndex < _heroRects.Length && _heroRects[displayedIndex].Contains(mousePos))
+                if (
+                    displayedIndex < _heroRects.Length
+                    && _heroRects[displayedIndex].Contains(mousePos)
+                )
                 {
                     Game.ShowHeroDetail(hero);
                     return;
@@ -125,9 +138,11 @@ namespace TurnBasedRPG
                 for (int i = 0; i < Game.ActiveParty.Count; i++)
                 {
                     var hero = Game.ActiveParty[i];
-                    if (hero is PlayerHero) continue;
+                    if (hero is PlayerHero)
+                        continue;
 
-                    if (displayedIndex >= _heroRects.Length) break;
+                    if (displayedIndex >= _heroRects.Length)
+                        break;
 
                     var rect = _heroRects[displayedIndex];
                     spriteBatch.Draw(_whitePixel, rect, new Color(45, 40, 75));
@@ -137,17 +152,40 @@ namespace TurnBasedRPG
 
                     if (_heroIconCache.TryGetValue(classKey, out var icon) && icon != null)
                     {
-                        spriteBatch.Draw(icon, new Rectangle(rect.X + 60, rect.Y + 40, 160, 160), Color.White);
+                        spriteBatch.Draw(
+                            icon,
+                            new Rectangle(rect.X + 60, rect.Y + 40, 160, 160),
+                            Color.White
+                        );
                     }
                     else
                     {
                         // Fallback
-                        spriteBatch.Draw(_whitePixel, new Rectangle(rect.X + 60, rect.Y + 40, 160, 160), new Color(60, 55, 85));
-                        spriteBatch.DrawString(_font, "NO ICON", new Vector2(rect.X + 95, rect.Y + 110), Color.Red);
+                        spriteBatch.Draw(
+                            _whitePixel,
+                            new Rectangle(rect.X + 60, rect.Y + 40, 160, 160),
+                            new Color(60, 55, 85)
+                        );
+                        spriteBatch.DrawString(
+                            _font,
+                            "NO ICON",
+                            new Vector2(rect.X + 95, rect.Y + 110),
+                            Color.Red
+                        );
                     }
 
-                    spriteBatch.DrawString(_font, hero.Name, new Vector2(rect.X + 40, rect.Y + 220), Color.White);
-                    spriteBatch.DrawString(_font, $"({hero.Class})", new Vector2(rect.X + 40, rect.Y + 255), Color.Cyan);
+                    spriteBatch.DrawString(
+                        _font,
+                        hero.Name,
+                        new Vector2(rect.X + 40, rect.Y + 220),
+                        Color.White
+                    );
+                    spriteBatch.DrawString(
+                        _font,
+                        $"({hero.Class})",
+                        new Vector2(rect.X + 40, rect.Y + 255),
+                        Color.Cyan
+                    );
 
                     displayedIndex++;
                 }

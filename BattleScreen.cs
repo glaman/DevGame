@@ -1,8 +1,9 @@
-// BattleScreen.cs - Refined layout with Guard/Defend ability included
+// BattleScreen.cs - Clean & Working Version
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 
 namespace TurnBasedRPG
 {
@@ -11,30 +12,25 @@ namespace TurnBasedRPG
         private Texture2D _whitePixel;
         private SpriteFont? _font;
 
-        // Top: Turn Order (max 100px height)
+        // Layout rectangles
         private Rectangle _turnOrderRect;
-        private Rectangle[] _turnOrderUnitRects = new Rectangle[8];
-
-        // Left: Player Team - H / P / H formation
         private Rectangle _playerTeamRect;
-        private Rectangle _helper1Rect;   // Top helper
-        private Rectangle _playerRect;    // Center player (leader)
-        private Rectangle _helper2Rect;   // Bottom helper
+        private Rectangle _enemyTeamRect;
+        private Rectangle _actionsRect;
+        private Rectangle _combatLogRect;
+        private Rectangle _startBattleButtonRect;
 
-        // Right: Enemies (up to 6)
-        private Rectangle _enemySideRect;
-        private Rectangle[] _enemyRects = new Rectangle[6];
+        // Battle data
+        private List<Entity> _playerTeam = new List<Entity>();
+        private List<Enemy> _enemyTeam = new List<Enemy>();
+        private List<Entity> _turnOrder = new List<Entity>();
+        private int _currentTurnIndex = 0;
 
-        // Bottom Left: Abilities (25% height, 50% width)
-        private Rectangle _actionBarRect;
-        private Rectangle[] _actionRects = new Rectangle[5]; // 4 abilities + Guard/Defend
+        private List<string> _combatLog = new List<string>();
+        private bool _battleStarted = false;
 
-        // Bottom Right: Action Log (25% height, 50% width)
-        private Rectangle _actionLogRect;
-
-        public BattleScreen(Game1 game) : base(game)
-        {
-        }
+        public BattleScreen(Game1 game)
+            : base(game) { }
 
         public override void LoadContent()
         {
@@ -44,130 +40,223 @@ namespace TurnBasedRPG
             try
             {
                 _font = Game.Content.Load<SpriteFont>("DefaultFont");
+                Console.WriteLine("[BattleScreen] Font loaded.");
             }
-            catch { _font = null; }
-
-            // Turn Order
-            _turnOrderRect = new Rectangle(0, 0, 1920, 100);
-            for (int i = 0; i < 8; i++)
+            catch (Exception ex)
             {
-                _turnOrderUnitRects[i] = new Rectangle(200 + i * 110, 10, 90, 80);
+                Console.WriteLine($"[ERROR] BattleScreen font failed: {ex.Message}");
             }
 
-            // Player Team - H / P / H formation
-            _playerTeamRect = new Rectangle(80, 140, 420, 520);
-            _helper1Rect = new Rectangle(140, 160, 180, 160);
-            _playerRect   = new Rectangle(120, 360, 220, 220);   // Larger leader position
-            _helper2Rect  = new Rectangle(140, 620, 180, 160);
+            _turnOrderRect = new Rectangle(0, 0, 1920, 140);
+            _playerTeamRect = new Rectangle(40, 160, 620, 580);
+            _enemyTeamRect = new Rectangle(1260, 160, 620, 580);
+            _actionsRect = new Rectangle(40, 760, 720, 280);
+            _combatLogRect = new Rectangle(780, 760, 1100, 280);
+            _startBattleButtonRect = new Rectangle(800, 400, 320, 80);
+        }
 
-            // Enemies
-            _enemySideRect = new Rectangle(580, 140, 1260, 520);
-            for (int i = 0; i < 6; i++)
+        public void StartTestBattle()
+        {
+            Console.WriteLine("[Battle] StartTestBattle called - initializing...");
+
+            _playerTeam.Clear();
+            _playerTeam.Add(new PlayerHero("You", "Sharpshooter") { CurrentHP = 100, MaxHP = 100 });
+            _playerTeam.Add(new HelperHero("Helper A", "Brawler") { CurrentHP = 100, MaxHP = 100 });
+            _playerTeam.Add(new HelperHero("Helper B", "Healer") { CurrentHP = 100, MaxHP = 100 });
+
+            _enemyTeam.Clear();
+            for (int i = 1; i <= 6; i++)
             {
-                int col = i % 3;
-                int row = i / 3;
-                _enemyRects[i] = new Rectangle(640 + col * 280, 180 + row * 260, 240, 220);
+                _enemyTeam.Add(new Enemy($"Enemy {i}") { CurrentHP = 25, MaxHP = 25 });
             }
 
-            // Bottom Left: Abilities + Guard/Defend (5 slots)
-            _actionBarRect = new Rectangle(80, 720, 860, 280);
-            for (int i = 0; i < 5; i++)
+            _turnOrder.Clear();
+            _turnOrder.Add(_enemyTeam[0]);
+            _turnOrder.Add(_enemyTeam[1]);
+            _turnOrder.Add(_playerTeam[0]);
+            _turnOrder.Add(_enemyTeam[2]);
+            _turnOrder.Add(_enemyTeam[3]);
+            _turnOrder.Add(_playerTeam[1]);
+            _turnOrder.Add(_enemyTeam[4]);
+            _turnOrder.Add(_enemyTeam[5]);
+            _turnOrder.Add(_playerTeam[2]);
+
+            _currentTurnIndex = 0;
+            _battleStarted = true;
+            _combatLog.Clear();
+
+            _combatLog.Add("=== BATTLE STARTED ===");
+            _combatLog.Add("Click bottom area or press SPACE to advance turns.");
+            Console.WriteLine("[Battle] Battle started successfully!");
+        }
+
+        private void ExecuteNextAttack()
+        {
+            if (!_battleStarted || _turnOrder.Count == 0)
+                return;
+
+            var attacker = _turnOrder[_currentTurnIndex];
+            Entity? target = _playerTeam.Contains(attacker)
+                ? _enemyTeam.Find(e => e.CurrentHP > 0)
+                : _playerTeam.Find(e => e.CurrentHP > 0);
+
+            if (target != null)
             {
-                _actionRects[i] = new Rectangle(140 + i * 160, 760, 140, 200);
+                target.CurrentHP = Math.Max(0, target.CurrentHP - 1);
+                _combatLog.Add($"{attacker.Name} attacks {target.Name} for 1 damage.");
+                if (target.CurrentHP <= 0)
+                    _combatLog.Add($"{target.Name} was defeated!");
+            }
+            else
+            {
+                _combatLog.Add($"{attacker.Name} has no targets.");
             }
 
-            // Bottom Right: Action Log
-            _actionLogRect = new Rectangle(980, 720, 860, 280);
+            if (_combatLog.Count > 15)
+                _combatLog.RemoveAt(0);
+
+            _currentTurnIndex = (_currentTurnIndex + 1) % _turnOrder.Count;
         }
 
         public override void Update(GameTime gameTime)
         {
-            HandleInput(gameTime);
-            Game.Window.Title = $"DevGame - Battle Screen - {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
+            HandleDevNavigation(gameTime);
+
+            if (Game.InputManager.IsKeyJustPressed(Keys.Space))
+            {
+                ExecuteNextAttack();
+            }
         }
 
-        protected override void OnMouseClick(Point mousePosition)
+        // IMPORTANT: Must be public override because Screen.OnMouseClick is now public
+        public override void OnMouseClick(Point mousePosition)
         {
-            // Click on abilities or Guard/Defend
-            for (int i = 0; i < 5; i++)
+            Console.WriteLine(
+                $"[BattleScreen] Mouse clicked at ({mousePosition.X}, {mousePosition.Y})"
+            );
+
+            if (!_battleStarted && _startBattleButtonRect.Contains(mousePosition))
             {
-                if (_actionRects[i].Contains(mousePosition))
-                {
-                    if (i == 4)
-                        Console.WriteLine("Guard/Defend selected - Reducing incoming damage this round");
-                    else
-                        Console.WriteLine($"Ability {i + 1} selected");
-                    return;
-                }
+                Console.WriteLine("[BattleScreen] START BATTLE BUTTON CLICKED!");
+                StartTestBattle();
+                return;
+            }
+
+            if (_battleStarted && _actionsRect.Contains(mousePosition))
+            {
+                Console.WriteLine("[BattleScreen] Actions area clicked - next turn");
+                ExecuteNextAttack();
             }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_whitePixel, new Rectangle(0, 0, 1920, 1080), new Color(15, 12, 28));
+            spriteBatch.Draw(_whitePixel, new Rectangle(0, 0, 1920, 1080), new Color(18, 16, 32));
 
-            if (_font != null)
+            if (_font == null)
+                return;
+
+            // Turn Order Bar
+            spriteBatch.Draw(_whitePixel, _turnOrderRect, new Color(30, 25, 50));
+            spriteBatch.DrawString(_font, "TURN ORDER", new Vector2(80, 35), Color.Cyan);
+
+            if (_battleStarted)
             {
-                // Top: Turn Order
-                spriteBatch.Draw(_whitePixel, _turnOrderRect, new Color(35, 30, 55));
-                spriteBatch.DrawString(_font, "TURN ORDER", new Vector2(80, 25), Color.Cyan);
-
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i < Math.Min(6, _turnOrder.Count); i++)
                 {
-                    spriteBatch.Draw(_whitePixel, _turnOrderUnitRects[i], new Color(55, 50, 80));
-                    spriteBatch.DrawString(_font, $"U{i+1}", new Vector2(_turnOrderUnitRects[i].X + 30, _turnOrderUnitRects[i].Y + 25), Color.LightGray);
+                    int idx = (_currentTurnIndex + i) % _turnOrder.Count;
+                    var entity = _turnOrder[idx];
+                    int x = 320 + i * 190;
+                    Color color = (i == 0) ? new Color(100, 220, 100) : new Color(55, 50, 85);
+                    spriteBatch.Draw(_whitePixel, new Rectangle(x, 55, 170, 60), color);
+                    spriteBatch.DrawString(
+                        _font,
+                        entity.Name,
+                        new Vector2(x + 15, 68),
+                        Color.White
+                    );
                 }
-
-                // Left: Player Team - H / P / H formation
-                spriteBatch.Draw(_whitePixel, _playerTeamRect, new Color(38, 33, 68));
-                spriteBatch.DrawString(_font, "YOUR TEAM", new Vector2(140, 150), Color.Cyan);
-
-                // Helper 1 (top)
-                spriteBatch.Draw(_whitePixel, _helper1Rect, new Color(50, 45, 75));
-                spriteBatch.DrawString(_font, "H1", new Vector2(190, 200), Color.LightGray);
-
-                // Player (center, larger, leader)
-                spriteBatch.Draw(_whitePixel, _playerRect, new Color(65, 55, 95));
-                spriteBatch.DrawString(_font, "P\n(YOU)", new Vector2(190, 420), Color.Yellow);
-
-                // Helper 2 (bottom)
-                spriteBatch.Draw(_whitePixel, _helper2Rect, new Color(50, 45, 75));
-                spriteBatch.DrawString(_font, "H2", new Vector2(190, 660), Color.LightGray);
-
-                // Right: Enemies
-                spriteBatch.Draw(_whitePixel, _enemySideRect, new Color(70, 25, 25));
-                spriteBatch.DrawString(_font, "ENEMIES", new Vector2(1080, 150), Color.Red);
-
-                for (int i = 0; i < 6; i++)
-                {
-                    spriteBatch.Draw(_whitePixel, _enemyRects[i], new Color(90, 35, 35));
-                    spriteBatch.DrawString(_font, $"E{i+1}", new Vector2(_enemyRects[i].X + 90, _enemyRects[i].Y + 90), Color.LightGray);
-                }
-
-                // Bottom Left: Abilities + Guard/Defend
-                spriteBatch.Draw(_whitePixel, _actionBarRect, new Color(28, 24, 50));
-                spriteBatch.DrawString(_font, "ACTIONS / ABILITIES", new Vector2(140, 740), Color.Cyan);
-
-                // 4 normal abilities + Guard/Defend as 5th option
-                for (int i = 0; i < 4; i++)
-                {
-                    spriteBatch.Draw(_whitePixel, _actionRects[i], new Color(60, 55, 90));
-                    spriteBatch.DrawString(_font, $"Ability {i+1}", new Vector2(_actionRects[i].X + 20, _actionRects[i].Y + 80), Color.LightGray);
-                }
-
-                // Guard / Defend (always available)
-                spriteBatch.Draw(_whitePixel, _actionRects[4], new Color(45, 70, 45)); // Green tint for defensive action
-                spriteBatch.DrawString(_font, "GUARD / DEFEND", new Vector2(_actionRects[4].X + 10, _actionRects[4].Y + 70), Color.LightGreen);
-                spriteBatch.DrawString(_font, "(Reduce damage this round)", new Vector2(_actionRects[4].X + 10, _actionRects[4].Y + 110), Color.DarkGray);
-
-                // Bottom Right: Action Log
-                spriteBatch.Draw(_whitePixel, _actionLogRect, new Color(28, 24, 50));
-                spriteBatch.DrawString(_font, "BATTLE LOG", new Vector2(1020, 740), Color.Cyan);
-                spriteBatch.DrawString(_font, "Turn 1: Waiting for player action...", 
-                    new Vector2(1020, 800), Color.LightGray);
-
-                DrawDevMenu(spriteBatch, _font);
             }
+            else
+            {
+                spriteBatch.DrawString(
+                    _font,
+                    "(Battle not started)",
+                    new Vector2(400, 70),
+                    Color.Gray
+                );
+            }
+
+            // Player Team
+            spriteBatch.Draw(_whitePixel, _playerTeamRect, new Color(35, 30, 60));
+            spriteBatch.DrawString(_font, "YOUR TEAM", new Vector2(80, 170), Color.Cyan);
+            for (int i = 0; i < _playerTeam.Count; i++)
+            {
+                var unit = _playerTeam[i];
+                int y = 240 + i * 140;
+                Color boxColor = unit.CurrentHP > 0 ? new Color(50, 45, 75) : new Color(40, 20, 20);
+                spriteBatch.Draw(_whitePixel, new Rectangle(80, y, 520, 110), boxColor);
+                spriteBatch.DrawString(_font, unit.Name, new Vector2(100, y + 25), Color.White);
+                spriteBatch.DrawString(
+                    _font,
+                    $"HP: {unit.CurrentHP}/{unit.MaxHP}",
+                    new Vector2(100, y + 65),
+                    Color.LightGreen
+                );
+            }
+
+            // Enemy Team
+            spriteBatch.Draw(_whitePixel, _enemyTeamRect, new Color(60, 25, 25));
+            spriteBatch.DrawString(_font, "ENEMIES", new Vector2(1300, 170), Color.Red);
+            for (int i = 0; i < _enemyTeam.Count; i++)
+            {
+                var enemy = _enemyTeam[i];
+                int y = 240 + i * 85;
+                Color boxColor =
+                    enemy.CurrentHP > 0 ? new Color(80, 30, 30) : new Color(50, 15, 15);
+                spriteBatch.Draw(_whitePixel, new Rectangle(1300, y, 520, 70), boxColor);
+                spriteBatch.DrawString(_font, enemy.Name, new Vector2(1320, y + 20), Color.White);
+                spriteBatch.DrawString(
+                    _font,
+                    $"HP: {enemy.CurrentHP}/25",
+                    new Vector2(1320, y + 45),
+                    Color.LightGreen
+                );
+            }
+
+            // Actions Area
+            spriteBatch.Draw(_whitePixel, _actionsRect, new Color(40, 35, 65));
+            spriteBatch.DrawString(_font, "BATTLE CONTROLS", new Vector2(80, 800), Color.Cyan);
+
+            if (!_battleStarted)
+            {
+                spriteBatch.Draw(_whitePixel, _startBattleButtonRect, new Color(70, 140, 70));
+                spriteBatch.DrawString(_font, "START BATTLE", new Vector2(860, 425), Color.White);
+            }
+            else
+            {
+                spriteBatch.DrawString(
+                    _font,
+                    "Click here or press SPACE for Next Attack",
+                    new Vector2(100, 860),
+                    Color.LightGreen
+                );
+            }
+
+            // Combat Log
+            spriteBatch.Draw(_whitePixel, _combatLogRect, new Color(25, 22, 40));
+            spriteBatch.DrawString(_font, "COMBAT LOG", new Vector2(820, 800), Color.LightGray);
+            for (int i = 0; i < Math.Min(12, _combatLog.Count); i++)
+            {
+                spriteBatch.DrawString(
+                    _font,
+                    _combatLog[i],
+                    new Vector2(840, 840 + i * 28),
+                    Color.LightGreen
+                );
+            }
+
+            DrawDevMenu(spriteBatch, _font);
         }
     }
 }
